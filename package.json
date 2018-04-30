@@ -1,0 +1,72 @@
+{
+  "name": "redux-actions-ts-reducer",
+  "version": "0.0.0",
+  "description": "Helps You to write reducers for redux-action actions in TypeScript in type-safe manner and without needing to specify excessive type information - everything is inferred based on types of redux-action actions and initial state",
+  "main": "./dist/index.js",
+  "typings": "./dist/index",
+  "types": "./dist/index",
+  "scripts": {
+    "dev": "concurrently --kill-others \"npm run build:watch\" \"npm run test:watch\"",
+    "postinstall": "cp ./hooks/pre-commit ./.git/hooks && echo 'installed pre-commit hook'",
+    "clean": "rimraf dist coverage junit.xml redux-actions-ts-reducer-*.tgz",
+    "clean:test": "rimraf dist/**/__tests__/",
+    "build": "tsc -p .",
+    "build:watch": "npm run build -- -w",
+    "lint": "npm run tslint && echo 'tslint check: OK'",
+    "tslint": "tslint --project ./tsconfig.json",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "preversion": "npm run clean && npm run build && npm run test && npm run lint && npm run clean:test && echo 'Bumped version, You are ready to publish'",
+    "postversion": "echo 'run \"git push --follow-tags && npm publish\"' to publish"
+  },
+  "keywords": [
+    "redux",
+    "redux-actions",
+    "TypeScript"
+  ],
+  "author": "Ats Uiboupin",
+  "license": "Apache-2.0",
+  "jest": {
+    "notify": true,
+    "moduleFileExtensions": [
+      "ts",
+      "js",
+      "json",
+      "jsx",
+      "node"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/__tests__/.*\\.test\\.ts$",
+    "verbose": true,
+    "testResultsProcessor": "jest-junit",
+    "bail": false,
+    "collectCoverage": true,
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text-summary"
+    ]
+  },
+  "peerDependencies": {
+    "redux-actions": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^22.2.3",
+    "@types/redux-actions": "^2.2.4",
+    "concurrently": "^3.5.1",
+    "jest": "^22.4.3",
+    "jest-junit": "^3.7.0",
+    "redux": "^4.0.0",
+    "redux-actions": "^2.0.3",
+    "rimraf": "^2.6.2",
+    "ts-jest": "^22.4.4",
+    "tslint": "5.9.1",
+    "tslint-config-airbnb": "5.8.0",
+    "typescript": "2.8.3"
+  },
+  "files": [
+    "dist/"
+  ]
+}

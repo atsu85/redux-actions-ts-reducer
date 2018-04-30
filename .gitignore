@@ -1,0 +1,8 @@
+.vscode/*
+.idea/*
+*.iml
+coverage/
+dist/
+node_modules/
+junit.xml
+redux-actions-ts-reducer-*.tgz

@@ -1,0 +1,25 @@
+# Set the default behavior, in case people don't have core.autocrlf set.
+* text eol=lf
+
+# windows scripts needs to have windows line endings
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+*.png binary
+*.jpg binary
+*.jar binary
+*.gz binary
+*.tar binary
+*.dll binary
+*.exe binary
+*.zip binary
+*.gif binary
+*.pdf binary
+*.rpt binary
+*.ttf binary
+*.jks binary
+*.mp3 binary
+*.xlsx binary
+*.ico binary
+*.woff binary
+*.woff2 binary

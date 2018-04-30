@@ -1,0 +1,24 @@
+#!/bin/bash
+cd "$(git rev-parse --show-toplevel)"
+
+command -v npm >/dev/null 2>&1 || { printf "\t\033[41mPlease install npm (Node Package Manager)\n"; exit 1; }
+
+# lint staged ts/tsx files
+STAGED_FILES=($(git diff --cached --name-only --diff-filter=ACM | grep "\.tsx\{0,1\}$"))
+
+if [[ "$STAGED_FILES" != "" ]]; then
+    echo "TSLint'ing ${#STAGED_FILES[@]} files: ${STAGED_FILES[@]}"
+    npm run tslint -- "${STAGED_FILES[@]}"
+
+    LINT_EXIT="$?"
+
+    if [[ "${LINT_EXIT}" == 0 ]]; then
+      printf "\n\033[42mGIT PRE-COMMIT HOOK: TSLINT SUCCEEDED\033[0m\n"
+    else
+      printf "\n\033[41mGIT PRE-COMMIT HOOK: TSLINT FAILED - ABORTING COMMIT: Fix linting errors and try again\n\033[0m\n"
+      printf "\033[42mYou could run ´\033[0mnpm run lint-fix\033[42m´ to fix linting error automatically\033[0m\n"
+      exit 1
+    fi
+fi
+
+exit $?
