@@ -1,6 +1,6 @@
 {
   "name": "redux-actions-ts-reducer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Helps You to write reducers for redux-action actions in TypeScript in type-safe manner and without needing to specify excessive type information - everything is inferred based on types of redux-action actions and initial state",
   "main": "./dist/index.js",
   "typings": "./dist/index",
