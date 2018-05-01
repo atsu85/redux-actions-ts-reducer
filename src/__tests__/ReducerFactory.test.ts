@@ -4,9 +4,12 @@ import { ReducerFactory } from '../ReducerFactory';
 
 const negate = createAction('NEGATE');
 const add = createAction<number>('ADD');
+const SOME_LIB_NO_ARGS_ACTION_TYPE = '@@some-lib/NO_ARGS_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
+const SOME_LIB_STRING_ACTION_TYPE = '@@some-lib/STRING_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 
 class SampleState {
 	count = 0;
+	message: string = null;
 }
 
 const sampleReducer = new ReducerFactory(new SampleState())
@@ -32,6 +35,17 @@ const sampleReducer = new ReducerFactory(new SampleState())
 			// Object literal may only specify known properties, and 'thisPropertyDoesNotExist' does not exist in type 'SampleState'.
 		};
 	})
+	// when adding reducer for action using string actionType (instead of redux-actions Action
+	.addReducer<string>(SOME_LIB_STRING_ACTION_TYPE, (state, action): SampleState => {
+		return {
+			...state,
+			message: action.payload,
+		};
+	})
+	// action.payload type is `void` by default
+	.addReducer(SOME_LIB_NO_ARGS_ACTION_TYPE, (state): SampleState => {
+		return new SampleState();
+	})
 	.toReducer();
 
 describe('Reducers created with ReducerFactory', () => {
@@ -49,6 +63,15 @@ describe('Reducers created with ReducerFactory', () => {
 				expect(store.getState().count).toEqual(2);
 			});
 
+			it('addReducer(actionType, reducerFunction)', () => {
+				const store = createStore(sampleReducer);
+				const newMessage = 'some payload';
+				store.dispatch({
+					type: SOME_LIB_STRING_ACTION_TYPE,
+					payload: newMessage,
+				});
+				expect(store.getState().message).toEqual(newMessage);
+			});
 		});
 
 		it('Can dispatch any action having payload type compatible with action that was added to reducer', () => {
@@ -67,8 +90,8 @@ describe('Reducers created with ReducerFactory', () => {
 			const store = createStore(sampleReducer);
 			const actionWithoutReducer = createAction<boolean>('UNKNOWN');
 			store.dispatch(actionWithoutReducer(true));
-			// ---------------^ Error: TS2345: Argument of type 'Action<boolean>' is not assignable to parameter of type 'Action<number | void>'.
-			// Type 'boolean' is not assignable to type 'number | void'.
+			// ---------------^ Error: TS2345: Argument of type 'Action<boolean>' is not assignable to parameter of type 'Action<string | number | void>'.
+			// Type 'boolean' is not assignable to type 'string | number | void'.
 		});
 		 */
 	});

@@ -11,10 +11,17 @@ export class ReducerFactory<S, Payload = never> {
 	}
 
 	/**
-	 * When using this method, then reducer action type is inferred in addition to reducer state type for state parameter and return type.
+	 * When using this method overload, reducers state parameter and return type are inferred.
+	 * See other overloads that also infer action payload type (or provide it for this method manually as generic type parameter).
 	 * @type P - action payload type (`void` by default that effectively prevents using reducer action payload unless payload type is mentioned with generic parameter type)
 	 */
-	public addReducer<P>(actionType: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P> {
+	public addReducer<P = void>(actionType: string, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
+	/**
+	 * When using this method overload, then reducer action type is also inferred in addition to reducer state type for state parameter and return type.
+	 * @type P - action payload type (`void` by default that effectively prevents using reducer action payload unless payload type is mentioned with generic parameter type)
+	 */
+	public addReducer<P>(actionType: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
+	public addReducer<P>(actionType: ActionFunction1<P, Action<P>> | string, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P> {
 		return this.addReducerInternal(actionType, reducer);
 	}
 
