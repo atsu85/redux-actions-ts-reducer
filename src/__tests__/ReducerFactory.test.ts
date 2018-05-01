@@ -1,9 +1,11 @@
-import { createAction } from 'redux-actions';
+import { Action, createAction, ReducerMap } from 'redux-actions';
 import { createStore } from 'redux';
 import { ReducerFactory } from '../ReducerFactory';
 
 const negate = createAction('NEGATE');
 const add = createAction<number>('ADD');
+const substract = createAction<number>('SUBSTRACT');
+const replace = createAction<SampleState>('REPLACE_STATE');
 const SOME_LIB_NO_ARGS_ACTION_TYPE = '@@some-lib/NO_ARGS_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 const SOME_LIB_STRING_ACTION_TYPE = '@@some-lib/STRING_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 
@@ -46,7 +48,34 @@ const sampleReducer = new ReducerFactory(new SampleState())
 	.addReducer(SOME_LIB_NO_ARGS_ACTION_TYPE, (state): SampleState => {
 		return new SampleState();
 	})
+	.addReducers(createReducerMap()) // just silly example, but may be useful when you can generate some reducers (for example paging/sorting/filtering reducers for any view with table)
 	.toReducer();
+
+/**
+ * This approach has much more boilerplate and much less type inference compared to `ReducerFactory.addReducer(action, reducer)`
+ * @return object that could be passed to redux-actions `handleActions(reducerMap, initialState)` or `ReducerFactory.addReducers(reducerMap)`
+ */
+function createReducerMap(): ReducerMap<SampleState, number | SampleState> {
+	return {
+		// In this case only state argument is inferred, but you need to specify
+		// type of action (that you may get wrong without TS compiler emitting error)
+		// You can omit return type, but be careful that you don't mistype anything -
+		// then TypeScript compiler won't emit error if you return object with additional properties
+		// (but it would still emit error when you return less properties than required by state).
+		[substract.toString()]: (state, action: Action<number>) /*: SampleState*/ => {
+			return {
+				...state,
+				count: state.count - action.payload,
+				thisPropertyDoesNotExist: 'Oops! this problem would be detected by TypeScript compiler if return type were set on the arrow function',
+				// ^^^ Error: TS2322: Type ... is not assignable to type 'SampleState'.
+				// Object literal may only specify known properties, and 'thisPropertyDoesNotExist' does not exist in type 'SampleState'.
+			};
+		},
+		[replace.toString()]: (state, action: Action<SampleState>): SampleState => {
+			return action.payload;
+		},
+	};
+}
 
 describe('Reducers created with ReducerFactory', () => {
 
@@ -72,6 +101,12 @@ describe('Reducers created with ReducerFactory', () => {
 				});
 				expect(store.getState().message).toEqual(newMessage);
 			});
+
+			it('addReducers(reducerMap)', () => {
+				const store = createStore(sampleReducer);
+				store.dispatch(substract(10));
+				expect(store.getState().count).toEqual(-10);
+			});
 		});
 
 		it('Can dispatch any action having payload type compatible with action that was added to reducer', () => {
@@ -90,8 +125,8 @@ describe('Reducers created with ReducerFactory', () => {
 			const store = createStore(sampleReducer);
 			const actionWithoutReducer = createAction<boolean>('UNKNOWN');
 			store.dispatch(actionWithoutReducer(true));
-			// ---------------^ Error: TS2345: Argument of type 'Action<boolean>' is not assignable to parameter of type 'Action<string | number | void>'.
-			// Type 'boolean' is not assignable to type 'string | number | void'.
+			// ---------------^ Error: TS2345: Argument of type 'Action<boolean>' is not assignable to parameter of type 'Action<string | number | void | SampleState>'.
+			// Type 'boolean' is not assignable to type 'string | number | void | SampleState'.
 		});
 		 */
 	});

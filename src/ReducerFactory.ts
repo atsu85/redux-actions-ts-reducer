@@ -25,6 +25,19 @@ export class ReducerFactory<S, Payload = never> {
 		return this.addReducerInternal(actionType, reducer);
 	}
 
+	/**
+	 * Usually it is easier and safer to use `addReducer(...)` methods instead of this method,
+	 * but sometimes it can become useful - for example when You can generate reducers for some actions automatically
+	 * (for example table paging/sorting/filtering related reducers)
+	 */
+	public addReducers<P>(anotherReducerMap: ReducerMap<S, P>): ReducerFactory<S, Payload | P> {
+		for (const actionType in anotherReducerMap) {
+			const reducerFunction = anotherReducerMap[actionType];
+			this.addReducerInternal(actionType, reducerFunction);
+		}
+		return this;
+	}
+
 	private addReducerInternal<P>(actionType: ActionFunction1<P, Action<P>> | string, reducer: ReducerMapValue<S, P>): ReducerFactory<S, Payload | P> {
 		const reducerMap: ReducerMap<S, Payload | P> = this.reducerMap;
 		reducerMap[actionType.toString()] = reducer;
