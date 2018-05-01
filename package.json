@@ -7,7 +7,7 @@
   "types": "./dist/index",
   "scripts": {
     "dev": "concurrently --kill-others \"npm run build:watch\" \"npm run test:watch\"",
-    "postinstall": "cp ./hooks/pre-commit ./.git/hooks && echo 'installed pre-commit hook'",
+    "setupPreCommitHook": "cp ./hooks/pre-commit ./.git/hooks && echo 'installed pre-commit hook'",
     "clean": "rimraf dist coverage junit.xml redux-actions-ts-reducer-*.tgz",
     "clean:test": "rimraf dist/**/__tests__/",
     "build": "tsc -p .",
