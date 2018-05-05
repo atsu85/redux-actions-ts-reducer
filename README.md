@@ -1,3 +1,5 @@
+[![CircleCI Build Status](https://circleci.com/gh/atsu85/redux-actions-ts-reducer.svg?style=svg)](https://circleci.com/gh/atsu85/redux-actions-ts-reducer)
+
 # Helpers for writing type-safe and bloat-free reducers using redux-actions and TypeScript
 Helps You to write reducers for `redux-actions` actions in TypeScript in type-safe manner 
 and without needing to specify excessive type information - 
