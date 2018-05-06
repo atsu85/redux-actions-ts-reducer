@@ -17,7 +17,7 @@ everything is inferred based on initial state and types of `redux-action` action
   * [No boilerblate, type-safe](#no-boilerblate-type-safe)
   * [Type-safety to the limits](#type-safety-to-the-limits)
   * [Code style](#code-style)
-* [Documentation](#documentation)
+* [More information](#more-information)
 
 ## Getting Started
 
