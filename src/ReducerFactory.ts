@@ -1,5 +1,7 @@
 import { Action, ActionFunction1, handleActions, Reducer, ReducerMap, ReducerMapValue } from 'redux-actions';
 
+type ActionTypeOrActionCreator<P> = ActionFunction1<P, Action<P>> | string;
+
 /**
  * @type S - State that all reducer functions (combined with this class) should use.
  * @type Payload - Payload for actions - type will be updated based on added reducer function action types on returned object type
@@ -17,12 +19,13 @@ export class ReducerFactory<S, Payload = never> {
 	 */
 	public addReducer<P = void>(actionType: string, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
 	/**
-	 * When using this method overload, then reducer action type is also inferred in addition to reducer state type for state parameter and return type.
-	 * @type P - action payload type (`void` by default that effectively prevents using reducer action payload unless payload type is mentioned with generic parameter type)
+	 * When using this method overload, then reducer action type is also inferred
+	 * (in addition to reducer state type for state parameter and return type).
+	 * @type P - action payload type
 	 */
-	public addReducer<P>(actionType: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
-	public addReducer<P>(actionType: ActionFunction1<P, Action<P>> | string, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P> {
-		return this.addReducerInternal(actionType, reducer);
+	public addReducer<P>(actionCreator: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
+	public addReducer<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P> {
+		return this.addReducerInternal(actionTypeOrActionCreator, reducer);
 	}
 
 	/**
@@ -38,9 +41,9 @@ export class ReducerFactory<S, Payload = never> {
 		return this;
 	}
 
-	private addReducerInternal<P>(actionType: ActionFunction1<P, Action<P>> | string, reducer: ReducerMapValue<S, P>): ReducerFactory<S, Payload | P> {
+	private addReducerInternal<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: ReducerMapValue<S, P>): ReducerFactory<S, Payload | P> {
 		const reducerMap: ReducerMap<S, Payload | P> = this.reducerMap;
-		reducerMap[actionType.toString()] = reducer;
+		reducerMap[actionTypeOrActionCreator.toString()] = reducer;
 		return this;
 	}
 
