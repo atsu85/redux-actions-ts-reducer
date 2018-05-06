@@ -2,10 +2,11 @@ import { Action, createAction, ReducerMap } from 'redux-actions';
 import { createStore } from 'redux';
 import { ReducerFactory } from '../ReducerFactory';
 
-const negate = createAction('NEGATE');
-const add = createAction<number>('ADD');
+const negate = createAction('NEGATE'); // returns `ActionFunction0<Action<void>>` - action creator function that doesn't take any arguments, and returns `Action<void>`
+const add = createAction<number>('ADD'); // returns `ActionFunction1<Payload, Action<Payload>>` - action creator function that takes `number` as only argument, and returns `Action<number>`
 const substract = createAction<number>('SUBSTRACT');
 const replace = createAction<SampleState>('REPLACE_STATE');
+
 const SOME_LIB_NO_ARGS_ACTION_TYPE = '@@some-lib/NO_ARGS_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 const SOME_LIB_STRING_ACTION_TYPE = '@@some-lib/STRING_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 
@@ -80,20 +81,31 @@ function createReducerMap(): ReducerMap<SampleState, number | SampleState> {
 describe('Reducers created with ReducerFactory', () => {
 
 	describe('can be used with redux `createStore(...):`', () => {
+		function createReduxStore() {
+			const store = createStore(sampleReducer);
+			store.dispatch(replace(new SampleState()));
+			return store;
+		}
 
 		it('Store state is initialized based on `new ReducerFactory(initialState)`', () => {
 			const store = createStore(sampleReducer);
 			expect(store.getState()).toEqual(new SampleState());
 		});
-		describe('Can dispatch action that was added to reducer using', () => {
-			it('addReducer(actionCreator, reducerFunction)', () => {
-				const store = createStore(sampleReducer);
+
+		describe('Actions created using `redux-action` action creator functions, are reduced by `reducerFunction` that was added to reducer using', () => {
+			it('addReducer(actionCreator: ActionFunction0<Action<void>>, reducerFunction)', () => {
+				const store = createReduxStore();
+				store.getState().count = 5;
+				store.dispatch(negate());
+				expect(store.getState().count).toEqual(-5);
+			});
+			it('addReducer(actionCreator: ActionFunction1<Payload, Action<Payload>>, reducerFunction)', () => {
+				const store = createReduxStore();
 				store.dispatch(add(2));
 				expect(store.getState().count).toEqual(2);
 			});
-
-			it('addReducer(actionType, reducerFunction)', () => {
-				const store = createStore(sampleReducer);
+			it('addReducer(actionType: string, reducerFunction)', () => {
+				const store = createReduxStore();
 				const newMessage = 'some payload';
 				store.dispatch({
 					type: SOME_LIB_STRING_ACTION_TYPE,
@@ -103,14 +115,14 @@ describe('Reducers created with ReducerFactory', () => {
 			});
 
 			it('addReducers(reducerMap)', () => {
-				const store = createStore(sampleReducer);
+				const store = createReduxStore();
 				store.dispatch(substract(10));
 				expect(store.getState().count).toEqual(-10);
 			});
 		});
 
 		it('Can dispatch any action having payload type compatible with action that was added to reducer', () => {
-			const store = createStore(sampleReducer);
+			const store = createReduxStore();
 			const payloadCompatibleWithAddedAction = createAction<number>('UNKNOWN_ACTION');
 			store.dispatch(payloadCompatibleWithAddedAction(1));
 			expect(store.getState().count).toEqual(0);
@@ -122,7 +134,7 @@ describe('Reducers created with ReducerFactory', () => {
 		 // and asserting error messages
 		 // https://github.com/fictitious/tsc-simple
 		 it(`TypeScript compiler emits error when trying to dispatch action that has has payload type incompatible with actions that are added to reducer`, () => {
-			const store = createStore(sampleReducer);
+			const store = createReduxStore();
 			const actionWithoutReducer = createAction<boolean>('UNKNOWN');
 			store.dispatch(actionWithoutReducer(true));
 			// ---------------^ Error: TS2345: Argument of type 'Action<boolean>' is not assignable to parameter of type 'Action<string | number | void | SampleState>'.
