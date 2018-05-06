@@ -6,6 +6,15 @@ const negate = createAction('NEGATE'); // returns `ActionFunction0<Action<void>>
 const add = createAction<number>('ADD'); // returns `ActionFunction1<Payload, Action<Payload>>` - action creator function that takes `number` as only argument, and returns `Action<number>`
 const substract = createAction<number>('SUBSTRACT');
 const replace = createAction<SampleState>('REPLACE_STATE');
+// ActionFunction2<Arg1, Arg2, Action<Payload>> - action creator function that takes `string` and `number` as arguments, and returns `Action<string>`
+const setMessage = createAction</*actionPayloadType*/ string, /*actionCreatorArg1*/ string, /*actionCreatorArg2*/ number>(
+	`SET_MESSAGE`,
+	createMessage,
+);
+
+function createMessage(prefix: string, suffix: number) {
+	return prefix + suffix;
+}
 
 const SOME_LIB_NO_ARGS_ACTION_TYPE = '@@some-lib/NO_ARGS_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
 const SOME_LIB_STRING_ACTION_TYPE = '@@some-lib/STRING_ACTION_TYPE'; // could be useful when action type like this is defined by 3rd party library
@@ -36,6 +45,12 @@ const sampleReducer = new ReducerFactory(new SampleState())
 			thisPropertyDoesNotExist: 'Oops! this problem would be detected by TypeScript compiler if return type were set on the arrow function',
 			// ^^^ Error: TS2322: Type ... is not assignable to type 'SampleState'.
 			// Object literal may only specify known properties, and 'thisPropertyDoesNotExist' does not exist in type 'SampleState'.
+		};
+	})
+	.addReducer(setMessage, (state, action): SampleState => {
+		return {
+			...state,
+			message: action.payload,
 		};
 	})
 	// when adding reducer for action using string actionType (instead of redux-actions Action
@@ -103,6 +118,11 @@ describe('Reducers created with ReducerFactory', () => {
 				const store = createReduxStore();
 				store.dispatch(add(2));
 				expect(store.getState().count).toEqual(2);
+			});
+			it('addReducer(actionCreator: ActionFunction2<Arg1, Arg2, Action<Payload>>, reducerFunction)', () => {
+				const store = createReduxStore();
+				store.dispatch(setMessage('arg1', 222));
+				expect(store.getState().message).toEqual(createMessage('arg1', 222));
 			});
 			it('addReducer(actionType: string, reducerFunction)', () => {
 				const store = createReduxStore();

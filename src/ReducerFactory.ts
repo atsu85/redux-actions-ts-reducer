@@ -1,6 +1,6 @@
-import { Action, ActionFunction1, handleActions, Reducer, ReducerMap, ReducerMapValue } from 'redux-actions';
+import { ActionFunctions, handleActions, Reducer, ReducerMap, ReducerMapValue } from 'redux-actions';
 
-type ActionTypeOrActionCreator<P> = ActionFunction1<P, Action<P>> | string;
+type ActionTypeOrActionCreator<P> = ActionFunctions<P> | string;
 
 /**
  * @type S - State that all reducer functions (combined with this class) should use.
@@ -23,7 +23,7 @@ export class ReducerFactory<S, Payload = never> {
 	 * (in addition to reducer state type for state parameter and return type).
 	 * @type P - action payload type
 	 */
-	public addReducer<P>(actionCreator: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
+	public addReducer<P>(actionCreator: ActionFunctions<P>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
 	public addReducer<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: Reducer<S, P>) {
 		return this.addReducerInternal(actionTypeOrActionCreator, reducer);
 	}
