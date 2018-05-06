@@ -24,7 +24,7 @@ export class ReducerFactory<S, Payload = never> {
 	 * @type P - action payload type
 	 */
 	public addReducer<P>(actionCreator: ActionFunction1<P, Action<P>>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P>;
-	public addReducer<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: Reducer<S, P>): ReducerFactory<S, Payload | P> {
+	public addReducer<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: Reducer<S, P>) {
 		return this.addReducerInternal(actionTypeOrActionCreator, reducer);
 	}
 
@@ -33,17 +33,25 @@ export class ReducerFactory<S, Payload = never> {
 	 * but sometimes it can become useful - for example when You can generate reducers for some actions automatically
 	 * (for example table paging/sorting/filtering related reducers)
 	 */
-	public addReducers<P>(anotherReducerMap: ReducerMap<S, P>): ReducerFactory<S, Payload | P> {
+	public addReducers<P>(anotherReducerMap: ReducerMap<S, P>) {
 		for (const actionType in anotherReducerMap) {
 			const reducerFunction = anotherReducerMap[actionType];
 			this.addReducerInternal(actionType, reducerFunction);
 		}
-		return this;
+		return this.asAllowingPayload<P>();
 	}
 
-	private addReducerInternal<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: ReducerMapValue<S, P>): ReducerFactory<S, Payload | P> {
+	private addReducerInternal<P>(actionTypeOrActionCreator: ActionTypeOrActionCreator<P>, reducer: ReducerMapValue<S, P>) {
 		const reducerMap: ReducerMap<S, Payload | P> = this.reducerMap;
 		reducerMap[actionTypeOrActionCreator.toString()] = reducer;
+		return this.asAllowingPayload<P>();
+	}
+
+	/**
+	 * Simply returns `this`
+	 * (but return type is improved, so that `P` is included in allowed `Payload` type)
+	 */
+	protected asAllowingPayload<P>(): ReducerFactory<S, Payload | P> {
 		return this;
 	}
 
