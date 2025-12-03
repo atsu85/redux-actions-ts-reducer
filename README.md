@@ -1,6 +1,25 @@
 [![CircleCI Build Status](https://circleci.com/gh/atsu85/redux-actions-ts-reducer.svg?style=svg)](https://circleci.com/gh/atsu85/redux-actions-ts-reducer)
 [![npm](https://img.shields.io/npm/v/redux-actions-ts-reducer.svg)](https://www.npmjs.com/package/redux-actions-ts-reducer)
 
+> [!WARNING]
+> **Deprecation Notice!**
+>
+> **Historical Context:**
+> When this library was created (May 2018),
+> achieving type safety in Redux reducers with TypeScript required significant boilerplate and generally wasn't worth the effort without this library.
+> **It served as an open-source solution for nearly 18 months before the Redux team officially released
+> [Redux Toolkit 1.0](https://blog.isquaredsoftware.com/2019/10/redux-starter-kit-1.0/)
+> (Oct 2019)
+> to address these same problems.**
+>
+> **Modern Alternative:**
+> Today, the standard approach is to use
+> [`createSlice`](https://redux-toolkit.js.org/api/createSlice)
+> from
+> [@reduxjs/toolkit](https://www.npmjs.com/package/@reduxjs/toolkit)
+> which provides type safety and automatic type inference in the same way this library originally pioneered.
+
+
 # redux-actions-ts-reducer
 
 Helper for writing type-safe and bloat-free reducers using redux-actions and TypeScript
